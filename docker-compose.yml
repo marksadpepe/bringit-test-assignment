@@ -1,0 +1,21 @@
+services:
+  mysql8:
+    image: mysql:8.0
+    restart: always
+    container_name: bringit-mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - bringit-mysql:/var/lib/mysql:delegated
+      #- ./init:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=blog
+      - MYSQL_USER=mysql
+      - MYSQL_PASSWORD=mysql
+    command: --default-authentication-plugin=mysql_native_password
+
+volumes:
+  bringit-mysql:
+    name: bringit-mysql
+    driver: local
