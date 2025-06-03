@@ -13,5 +13,5 @@ The project is a PHP backend organized as follows:
 - **Router.php** - class for request routing
 - **routes.php** - file with route definitions (mappings)
 - **build/** - directory for project build files
-- **Controllers/** - directory containing User and Post controllers thah handle HTTP requests
+- **Controllers/** - directory containing User and Post controllers that handle HTTP requests
 - **Services/** - directory containing User and Post services with business logic
