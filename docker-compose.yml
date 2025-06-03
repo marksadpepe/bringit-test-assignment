@@ -7,13 +7,48 @@ services:
       - 3306:3306
     volumes:
       - bringit-mysql:/var/lib/mysql:delegated
-      #- ./init:/docker-entrypoint-initdb.d
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=blog
       - MYSQL_USER=mysql
       - MYSQL_PASSWORD=mysql
     command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # TODO: need a better way to do this
+  grant-privileges:
+    image: mysql:8.0
+    depends_on:
+      mysql8:
+        condition: service_healthy
+    command: |
+      sh -c "
+        echo 'Waiting for MySQL to be ready...' &&
+        sleep 5 &&
+        mysql -h bringit-mysql -u root -proot -e \"GRANT ALL PRIVILEGES ON *.* TO 'mysql'@'%'; FLUSH PRIVILEGES;\" &&
+        echo 'Privileges granted!'
+      "
+    restart: "no"
+
+  backend-app-nest:
+    image: backend-nest
+    build:
+      context: "$ROOT/backend-nest"
+      dockerfile: "$ROOT/backend-nest/build/backend/Dockerfile"
+    container_name: backend-app-nest
+    env_file: "$ROOT/backend-nest/.env"
+    ports:
+      - "${BACKEND_NEST_PORT}:3000"
+    volumes:
+      - "$ROOT/backend-nest:/app:delegated"
+    depends_on:
+      grant-privileges:
+        condition: service_completed_successfully
 
 volumes:
   bringit-mysql:
