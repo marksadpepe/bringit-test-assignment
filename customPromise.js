@@ -110,22 +110,6 @@ class CustomPromise {
       }
     );
   }
-
-  static resolve(value) {
-    if (value instanceof CustomPromise) {
-      return value;
-    }
-
-    return new CustomPromise((resolve) => {
-      resolve(value);
-    });
-  }
-
-  static reject(reason) {
-    return new CustomPromise((resolve, reject) => {
-      reject(reason);
-    });
-  }
 }
 
 const pr1 = new CustomPromise((resolve, reject) => {
