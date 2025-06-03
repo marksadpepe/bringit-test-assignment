@@ -3,3 +3,4 @@ backend*/.env
 backend*/dist
 .env
 backend-nest/generated/prisma
+backend-php/config.php

@@ -18,5 +18,5 @@ RUN npm install --ignore-scripts -g @nestjs/cli
 
 USER application
 
-CMD npm ci && npm run prisma:generate && npm run prisma:deploy && npm run start:dev
+CMD npm ci && npm run start:dev
 
