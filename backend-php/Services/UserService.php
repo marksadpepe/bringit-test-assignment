@@ -33,13 +33,30 @@ class UserService {
     ];
   }
   
-  public static function get_users(): array {
+  public static function get_users(array $params): array {
     global $db;
 
     $idx = 0;
     $users = [];
+    $page = (int)$params["page"];
+    $limit = (int)$params["limit"];
+    $searchEmail = $params["searchEmail"];
 
-    $query = "select " . self::$table_name . ".id, name, email, count(posts.id) as postCount from " . self::$table_name . " left join posts on " . self::$table_name . ".id = posts.authorId where " . self::$table_name . ".deletedAt is null group by " . self::$table_name . ".id";
+    $offset = ($page - 1) * $limit;
+    $whereConditions = [self::$table_name . ".deletedAt is null"];
+
+    if (!empty($searchEmail)) {
+      $whereConditions[] = self::$table_name . ".email like '%{$searchEmail}%'";
+    }
+
+    $where = "where " . implode(" and ", $whereConditions);
+
+    $query = "select " . self::$table_name . ".id, name, email, count(posts.id) as postCount from " . self::$table_name . " left join posts on " . self::$table_name . ".id = posts.authorId " . $where . " group by " . self::$table_name . ".id limit {$limit} offset {$offset}";
+
+    $count_query = "select count(*) as total from " . self::$table_name;
+    $cresult = $db->query($count_query)["result"];
+    $total = (int)$cresult->fetch_assoc()["total"];
+    $total_pages = $total > 0 ? (int)ceil($total / $limit) : 1;
 
     $qresult = $db->query($query)["result"];
 
@@ -49,7 +66,16 @@ class UserService {
       $idx++;
     }
 
-    return $users;
+    $meta = [
+      "total" => $total,
+      "page" => $page,
+      "limit" => $limit,
+      "totalPages" => $total_pages,
+      "hasNextPage" => $page < $total_pages,
+      "hasPrevPage" => $page > 1,
+    ];
+
+    return ["data" => $users, "meta" => $meta];
   }
 
   public static function get_user_by_id(string $id): array {

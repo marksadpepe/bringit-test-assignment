@@ -8,6 +8,7 @@ use Blog\Services\UserService;
 class UserController {
   public static function create_user(Request $req, array $route_params): Response {
     $body = $req->get_body();
+    
     try {
       $result = UserService::create($body);
 
@@ -19,12 +20,19 @@ class UserController {
   }
 
   public static function get_users(Request $req, array $route_params): Response {
+    $params = [
+      "page" => $req->get_query_param("page") ?? 1,
+      "limit" => $req->get_query_param("limit") ?? 10,
+      "searchEmail" => $req->get_query_param("searchEmail") ?? null,
+    ];
+
     try {
-      $users = UserService::get_users();
+      $users = UserService::get_users($params);
       
       return Response::json(200, $users);
     } catch (\Exception $e) {
       [$status_code, $err_msg] = explode(":", $e->getMessage());
+      
       return Response::json((int)$status_code, ["message" => $err_msg, "statusCode" => (int)$status_code]);
     }
   }

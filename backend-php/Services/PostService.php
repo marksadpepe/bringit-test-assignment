@@ -32,13 +32,25 @@ class PostService {
     return ["success" => true];
   }
 
-  public static function get_posts(): array {
+  public static function get_posts(array $params): array {
     global $db;
 
     $idx = 0;
     $posts = [];
+    $page = (int)$params["page"];
+    $limit = (int)$params["limit"];
+    $searchTitle = $params["searchTitle"];
 
-    $query = "select " . self::$table_name . ".id, title, users.id as author_id, users.name as author_name from " . self::$table_name . " inner join users on " . self::$table_name . ".authorId = users.id";
+    $offset = ($page - 1) * $limit;
+    $whereConditions = [self::$table_name . ".deletedAt is null"];
+
+    if (!empty($searchTitle)) {
+      $whereConditions[] = self::$table_name . ".title like '%{$searchTitle}%'";
+    }
+
+    $where = "where " . implode(" and ", $whereConditions);
+
+    $query = "select " . self::$table_name . ".id, title, users.id as author_id, users.name as author_name from " . self::$table_name . " inner join users on " . self::$table_name . ".authorId = users.id " . $where;
 
     $qresult = $db->query($query)["result"];
 
@@ -50,7 +62,21 @@ class PostService {
       $idx++;
     }
 
-    return $posts;
+    $count_query = "select count(*) as total from " . self::$table_name . " " . $where;
+    $cresult = $db->query($count_query)["result"];
+    $total = (int)$cresult->fetch_assoc()["total"];
+    $total_pages = $total > 0 ? (int)ceil($total / $limit) : 1;
+
+    $meta = [
+      "total" => $total,
+      "page" => $page,
+      "limit" => $limit,
+      "totalPages" => $total_pages,
+      "hasNextPage" => $page < $total_pages,
+      "hasPrevPage" => $page > 1,
+    ];
+
+    return ["data" => $posts, "meta" => $meta];
   }
 }
 ?>
