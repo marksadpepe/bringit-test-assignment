@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { User } from 'generated/prisma';
-import { GetUserItem } from 'src/types/interfaces/user/user';
+import { GetUserItem, UserWithCount } from 'src/types/interfaces/user/user';
 
 @Injectable()
 export class UserDataMapper {
-  toUserItem(data: User): GetUserItem {
-    const { id, name, email } = data;
+  toUserItem(data: UserWithCount): GetUserItem {
+    const {
+      id,
+      name,
+      email,
+      _count: { posts: postCount },
+    } = data;
 
-    return { id, name, email, postCount: 4 };
+    return { id, name, email, postCount };
   }
 }

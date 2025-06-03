@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, User } from 'generated/prisma';
 import { PrismaService } from 'src/database/prisma.service';
-import { CreateUserItem } from 'src/types/interfaces/user/user';
+import { CreateUserItem, UserWithCount } from 'src/types/interfaces/user/user';
 
 @Injectable()
 export class UserRepository {
@@ -19,12 +19,19 @@ export class UserRepository {
     skip: number,
     take: number,
     where: Prisma.UserWhereInput,
-  ): Promise<[User[], number]> {
-    const data: [User[], number] = await Promise.all([
+  ): Promise<[UserWithCount[], number]> {
+    const data: [UserWithCount[], number] = await Promise.all([
       this.prismaService.user.findMany({
         where,
         skip,
         take,
+        include: {
+          _count: {
+            select: {
+              posts: true,
+            },
+          },
+        },
       }),
       this.prismaService.user.count({
         where,

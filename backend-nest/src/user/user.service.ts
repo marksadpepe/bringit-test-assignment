@@ -31,7 +31,6 @@ export class UserService {
   }
 
   async getUsers(params: GetUsersQueryParams): Promise<GetUsersData> {
-    console.log(params);
     const { page = 1, limit = 10, searchEmail } = params;
 
     const skip = (page - 1) * limit;

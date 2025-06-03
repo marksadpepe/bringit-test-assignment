@@ -1,3 +1,5 @@
+import { User } from 'generated/prisma';
+
 export interface CreateUserItem {
   name: string;
   email: string;
@@ -33,4 +35,8 @@ export interface GetUsersQueryParams {
   page?: number;
   limit?: number;
   searchEmail?: string;
+}
+
+export interface UserWithCount extends User {
+  _count: { posts: number };
 }
