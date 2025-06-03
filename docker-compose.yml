@@ -35,6 +35,26 @@ services:
       "
     restart: "no"
 
+  db-migrations:
+    image: backend-nest
+    build:
+      context: "$ROOT/backend-nest"
+      dockerfile: "$ROOT/backend-nest/build/backend/Dockerfile"
+    container_name: db-migrations
+    env_file: "$ROOT/backend-nest/.env"
+    command: |
+      sh -c "
+        echo 'Running database migrations...' &&
+        npm run prisma:deploy &&
+        echo 'Migrations completed successfully!'
+      "
+    volumes:
+      - "$ROOT/backend-nest:/app:delegated"
+    depends_on:
+      grant-privileges:
+        condition: service_completed_successfully
+    restart: "no"
+
   backend-app-nest:
     image: backend-nest
     build:
@@ -47,7 +67,7 @@ services:
     volumes:
       - "$ROOT/backend-nest:/app:delegated"
     depends_on:
-      grant-privileges:
+      db-migrations:
         condition: service_completed_successfully
 
   backend-app-php:
@@ -63,17 +83,14 @@ services:
       - "${BACKEND_PHP_PORT}:8000"
     volumes:
       - "${ROOT}/backend-php:/var/www/html:delegated"
-      # - "${ROOT}/logs/php:/var/log/php:delegated"
     environment:
       - DB_HOST=bringit-mysql
       - DB_PORT=3306
       - PORT=8000
       - HOST=0.0.0.0
-      # - ORIGIN=*
     depends_on:
-      backend-app-nest:
-        # condition: service_completed_successfully
-        condition: service_started
+      db-migrations:
+        condition: service_completed_successfully
 
 volumes:
   bringit-mysql:
