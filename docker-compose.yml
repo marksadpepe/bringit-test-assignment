@@ -20,6 +20,21 @@ services:
       retries: 5
       start_period: 15s
 
+  # TODO: need a better way to do this
+  grant-privileges:
+    image: mysql:8.0
+    depends_on:
+      mysql8:
+        condition: service_healthy
+    command: |
+      sh -c "
+        echo 'Waiting for MySQL to be ready...' &&
+        sleep 5 &&
+        mysql -h bringit-mysql -u root -proot -e \"GRANT ALL PRIVILEGES ON *.* TO 'mysql'@'%'; FLUSH PRIVILEGES;\" &&
+        echo 'Privileges granted!'
+      "
+    restart: "no"
+
   backend-app-nest:
     image: backend-nest
     build:
@@ -27,11 +42,13 @@ services:
       dockerfile: "$ROOT/backend-nest/build/backend/Dockerfile"
     container_name: backend-app-nest
     env_file: "$ROOT/backend-nest/.env"
+    ports:
+      - "${BACKEND_NEST_PORT}:3000"
     volumes:
       - "$ROOT/backend-nest:/app:delegated"
     depends_on:
-      mysql8:
-        condition: service_healthy
+      grant-privileges:
+        condition: service_completed_successfully
 
 volumes:
   bringit-mysql:
