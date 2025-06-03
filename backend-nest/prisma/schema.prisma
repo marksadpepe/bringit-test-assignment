@@ -36,8 +36,8 @@ model Post {
   updatedAt DateTime  @updatedAt @db.Timestamp(0)
   deletedAt DateTime? @db.Timestamp(0)
 
-  userId String @db.Char(36)
-  user   User   @relation(fields: [userId], references: [id])
+  authorId String @db.Char(36)
+  author   User   @relation(fields: [authorId], references: [id])
 
   @@map("posts")
 }
