@@ -30,6 +30,18 @@ class Request {
     return $this->uri;
   }
 
+  public function get_path(): string {
+    return parse_url($this->uri, PHP_URL_PATH) ?? $this->uri;
+  }
+
+  public function get_query_param(string $key): ?string {
+    return $_GET[$key] ?? null;
+  }
+
+  public function get_query_params(): array {
+    return $_GET;
+  }
+
   public function get_headers(): array {
     foreach($_SERVER as $key=>$value) {
       if (strpos($key, "HTTP_") === 0) {

@@ -53,12 +53,14 @@ class Router {
     $method = $req->get_method();
     $uri = $req->get_uri();
 
+    $path = $req->get_path();
+
     foreach($this->routes as $pattern=>$values) {
-      if (preg_match($pattern, $uri, $matches)) {
+      if (preg_match($pattern, $path, $matches)) {
         $find_uri = true;
 
         if (!isset($this->routes[$pattern][$method])) {
-          return Response::json(405, ["error" => "Method Not Allowed"]);
+          return Response::json(405, ["message" => "Method Not Allowed", "statusCode" => 405]);
         }
 
         [$mdws, $handler] = $this->routes[$pattern][$method];
@@ -78,7 +80,7 @@ class Router {
     }
 
     if (!$find_uri) {
-      return Response::json(404, ["error" => "Page Not Found"]);
+      return Response::json(404, ["message" => "Page Not Found", "statusCode" => 404]);
     }
   }
 }
