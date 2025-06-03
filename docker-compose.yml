@@ -4,7 +4,7 @@ services:
     restart: always
     container_name: bringit-mysql
     ports:
-      - 3306:3306
+      - "3306:3306"
     volumes:
       - bringit-mysql:/var/lib/mysql:delegated
     environment:
@@ -49,6 +49,31 @@ services:
     depends_on:
       grant-privileges:
         condition: service_completed_successfully
+
+  backend-app-php:
+    image: backend-php
+    build:
+      context: "$ROOT/backend-php"
+      dockerfile: "$ROOT/backend-php/build/backend/Dockerfile"
+      args:
+      - USER_ID=${USER_ID:-1000}
+      - GROUP_ID=${GROUP_ID:-1000}
+    container_name: backend-app-php
+    ports:
+      - "${BACKEND_PHP_PORT}:8000"
+    volumes:
+      - "${ROOT}/backend-php:/var/www/html:delegated"
+      # - "${ROOT}/logs/php:/var/log/php:delegated"
+    environment:
+      - DB_HOST=bringit-mysql
+      - DB_PORT=3306
+      - PORT=8000
+      - HOST=0.0.0.0
+      # - ORIGIN=*
+    depends_on:
+      backend-app-nest:
+        # condition: service_completed_successfully
+        condition: service_started
 
 volumes:
   bringit-mysql:

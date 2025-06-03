@@ -28,21 +28,17 @@ class Response {
   }
 
   public function send(): void {
-    global $TOKEN_TTL;
+    if (!headers_sent()) {
+      http_response_code($this->status_code); 
 
-    http_response_code($this->status_code);
-
-    foreach($this->headers as $h) {
-      header($h);
-    }
-
-    foreach($this->cookies as $name=>$value) {
-      $cookie_header = "Set-Cookie: {$name}={$value}; Path=/; HttpOnly";
-      if ($name == "refresh_token") {
-        $max_age = $TOKEN_TTL * 24 * 60 * 60;
-        $cookie_header .= "; Max-Age={$max_age}";
+      foreach($this->headers as $h) {
+        header($h);
       }
-      header($cookie_header);
+
+      foreach($this->cookies as $name=>$value) {
+        $cookie_header = "Set-Cookie: {$name}={$value}; Path=/; HttpOnly";
+        header($cookie_header);
+      }
     }
 
     echo $this->content;
