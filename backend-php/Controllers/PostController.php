@@ -9,6 +9,10 @@ class PostController {
   public static function create_post(Request $req, array $route_params): Response {
     $body = $req->get_body();
 
+    if (!$body) {
+      return Response::json(400, ["message" => "Request body is required", "statusCode" => 400]);
+    }
+
     try {
       $result = PostService::create($body);
   

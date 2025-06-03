@@ -9,12 +9,17 @@ class UserController {
   public static function create_user(Request $req, array $route_params): Response {
     $body = $req->get_body();
     
+    if (!$body) {
+      return Response::json(400, ["message" => "Request body is required", "statusCode" => 400]);
+    }
+    
     try {
       $result = UserService::create($body);
 
       return Response::json(201, $result);
     } catch (\Exception $e) {
       [$status_code, $err_msg] = explode(":", $e->getMessage());
+
       return Response::json((int)$status_code, ["message" => $err_msg, "statusCode" => (int)$status_code]);
     }
   }
@@ -32,7 +37,7 @@ class UserController {
       return Response::json(200, $users);
     } catch (\Exception $e) {
       [$status_code, $err_msg] = explode(":", $e->getMessage());
-      
+
       return Response::json((int)$status_code, ["message" => $err_msg, "statusCode" => (int)$status_code]);
     }
   }

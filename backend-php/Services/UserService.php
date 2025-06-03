@@ -25,7 +25,10 @@ class UserService {
       throw new \Exception("400:Age must be greater than 12");
     }
 
-    $query = "insert into " . self::$table_name . "(name, email, age) values('{$name}', '{$email}', '{$age}')";
+    $id = bin2hex(random_bytes(16));
+    $now = date('Y-m-d H:i:s');
+
+    $query = "insert into " . self::$table_name . "(id, name, email, age, createdAt, updatedAt) values('{$id}', '{$name}', '{$email}', '{$age}', '{$now}', '{$now}')";
     $db->query($query);
 
     return [
