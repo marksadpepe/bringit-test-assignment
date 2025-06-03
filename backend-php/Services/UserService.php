@@ -56,7 +56,7 @@ class UserService {
 
     $query = "select " . self::$table_name . ".id, name, email, count(posts.id) as postCount from " . self::$table_name . " left join posts on " . self::$table_name . ".id = posts.authorId " . $where . " group by " . self::$table_name . ".id limit {$limit} offset {$offset}";
 
-    $count_query = "select count(*) as total from " . self::$table_name;
+    $count_query = "select count(*) as total from " . self::$table_name . " " . $where;
     $cresult = $db->query($count_query)["result"];
     $total = (int)$cresult->fetch_assoc()["total"];
     $total_pages = $total > 0 ? (int)ceil($total / $limit) : 1;
