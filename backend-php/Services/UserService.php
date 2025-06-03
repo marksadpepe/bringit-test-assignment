@@ -1,14 +1,19 @@
 <?php
 namespace Blog\Services;
 
-use Blog\Services\Role;
-use Blog\Services\UserRole;
-
 class UserService {
   private static string $table_name = "users";
 
-  public static function create(string $name, string $email, int $age): array {
+  public static function create(array $data): array {
     global $db;
+
+    $name = $data["name"] ?? null;
+    $email = $data["email"] ?? null;
+    $age = $data["age"] ?? null;
+
+    if (empty($name) || empty($email) || empty($age)) {
+      throw new \Exception("400:User name, email and age must be specified");
+    }
 
     $res = $db->query("select id from users where email = '{$email}'")["result"];
     $candidate = $res->fetch_assoc();
@@ -45,6 +50,20 @@ class UserService {
     }
 
     return $users;
+  }
+
+  public static function get_user_by_id(string $id): array {
+    global $db;
+
+    $query = "select id from " . self::$table_name . " where id = '{$id}' and deletedAt is null";
+
+    $user = $db->query($query)["result"]->fetch_assoc();
+
+    if (!$user) {
+      throw new \Exception("404:User {$id} not found");
+    }
+
+    return $user;
   }
 }
 ?>
