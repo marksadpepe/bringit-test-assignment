@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from 'src/app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
 
-import { AllExceptionsFilter } from './excpetion/all-exceptions-filter';
+import { AllExceptionsFilter } from 'src/excpetion/all-exceptions-filter';
 import { DocumentBuilder } from '@nestjs/swagger';
 import { SwaggerModule } from '@nestjs/swagger';
 

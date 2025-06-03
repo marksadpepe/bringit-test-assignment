@@ -1,13 +1,13 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { UserRepository } from './user.repository';
+import { UserRepository } from 'src/user/user.repository';
 import {
   CreateUserItem,
   CreateUserItemResult,
   GetUsersData,
   GetUsersQueryParams,
 } from 'src/types/interfaces/user/user';
-import { UserDataMapper } from './user.data-mapper';
-import { Prisma } from '../../generated/prisma/client';
+import { UserDataMapper } from 'src/user/user.data-mapper';
+import { Prisma } from 'generated/prisma/client';
 
 @Injectable()
 export class UserService {
