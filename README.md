@@ -36,7 +36,7 @@ In the root project folder you need to create a ```.env``` file similar to the `
 ```
 BACKEND_NEST_PORT=4000
 BACKEND_PHP_PORT=5000
-ROOT=/Users/mark/Workspace/Code/bringit-test-assignment
+ROOT=YOUR_ABSOLUTE_PATH/bringit-test-assignment
 ```
 
 - ```BACKEND_NEST_PORT``` variable need to map ports for NestJS backend service. If everything is specified correctly, after launching all containers, Swagger for NestJS backend will be available at *http://localhost:BACKEND_NEST_PORT*, where ```BACKEND_NEST_PORT``` is **4000** by default (like in ```.env.example``` file).
